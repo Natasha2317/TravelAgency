@@ -14,7 +14,7 @@ SECRET_KEY = '=fp3=+y%6qsai6@=@jc0(jpdrlok!gp%493_(uvi68j@8w*$a#'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['travel-agency.std-946.ist.mospolytech.ru']
+ALLOWED_HOSTS = ['travel-agency.std-946.ist.mospolytech.ru', '*']
 
 
 # Application definition
