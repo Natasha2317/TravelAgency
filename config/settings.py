@@ -12,7 +12,7 @@ _PATH = os.path.dirname(os.path.dirname(__file__))
 SECRET_KEY = '=fp3=+y%6qsai6@=@jc0(jpdrlok!gp%493_(uvi68j@8w*$a#'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['*']
 
