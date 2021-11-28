@@ -12,7 +12,7 @@ _PATH = os.path.dirname(os.path.dirname(__file__))
 SECRET_KEY = '=fp3=+y%6qsai6@=@jc0(jpdrlok!gp%493_(uvi68j@8w*$a#'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['travel-agency.std-946.ist.mospolytech.ru', '*']
 
@@ -29,6 +29,7 @@ INSTALLED_APPS = [
     'crispy_forms',
     'crispy_bootstrap5',
     'application',
+    'application.apps.ApplicationConfig',
 
 ]
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
@@ -137,3 +138,4 @@ STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
 )
+
