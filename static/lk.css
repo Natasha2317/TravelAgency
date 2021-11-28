@@ -1,0 +1,24 @@
+.name_user{
+    text-align: end;
+    margin-top: 1%;
+}
+h2, h3{
+    text-align: center;
+}
+
+table a{
+    color: white;
+    text-decoration: none;
+}
+.lists{
+    margin-top: 3%;
+}
+label.form-label.requiredField{
+    display: none;
+}
+.nolabel label.form-label{
+    display: none;
+}
+
+
+
