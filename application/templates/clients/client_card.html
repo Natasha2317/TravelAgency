@@ -23,7 +23,7 @@
                             <a class="nav-link" href="#">Главная</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link active" aria-current="page" href="#">Личный кабинет</a>
+                            <a class="nav-link active" aria-current="page" href="{% url 'account' %}">Личный кабинет</a>
                         </li>
                     </ul>
                     <a class="navbar-text" href="{% url 'logout' %}">
@@ -64,7 +64,7 @@
                                 <option value="Ж">Женский</option>
                         </select>
                         <label for="dob" class="form-label">Дата рождения</label>
-                        {{ form.date_birthday|as_crispy_field }}<br>
+                        <input type="date" name="date_birthday" id="dob" value="{{ client.date_birthday|date:"Y-m-d" }}" class="mb-3 form-control"><br>
                         <label for="place" class="form-label">Место рождения</label>
                         {{ form.place_birthday|as_crispy_field }}<br>
                     </div>
@@ -74,9 +74,9 @@
                         <label for="passport_number" class="form-label">Номер</label>
                         {{ form.passport_number|as_crispy_field }}
                         <label for="passport_date_issue" class="form-label">Дата выдачи</label>
-                        {{ form.passport_date_issue|as_crispy_field }}
+                        <input type="date" name="date_birthday" id="dob" value="{{ client.passport_date_issue|date:"Y-m-d" }}" class="mb-3 form-control"><br>
                         <label for="passport_date_expiration" class="form-label">Дата окончания срока действия</label>
-                        {{ form.passport_date_expiration|as_crispy_field }}
+                        <input type="date" name="date_birthday" id="dob" value="{{ client.passport_date_expiration|date:"Y-m-d" }}" class="mb-3 form-control"><br>
                         <label for="passport_authority" class="form-label">Орган, выдавший документ</label>
                         {{ form.passport_authority|as_crispy_field}}<br>
                     </div>

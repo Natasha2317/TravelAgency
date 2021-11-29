@@ -23,7 +23,7 @@
                             <a class="nav-link" href="#">Главная</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link active" aria-current="page" href="#">Личный кабинет</a>
+                            <a class="nav-link active" aria-current="page" href="{% url 'account' %}">Личный кабинет</a>
                         </li>
                     </ul>
                     <a class="navbar-text" href="{% url 'logout' %}">
@@ -43,7 +43,7 @@
                 <label for="fio" class="form-label">ФИО</label>
                 {{ form.worker_fio|as_crispy_field }}
                 <label for="dob" class="form-label">Дата рождения</label>
-                {{ form.date_birthday|as_crispy_field }}
+                <input type="date" name="date_birthday" id="dob" value="{{ worker.date_birthday|date:"Y-m-d" }}" class="mb-3 form-control"><br>
                 {% if worker.photo %}
                 <label for="photo" class="form-label">Фото</label>
                 <div>

@@ -23,7 +23,7 @@
                             <a class="nav-link" href="#">Главная</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link active" aria-current="page" href="#">Личный кабинет</a>
+                            <a class="nav-link active" aria-current="page" href="{% url 'account' %}">Личный кабинет</a>
                         </li>
                     </ul>
                     <a class="navbar-text" href="{% url 'logout' %}">
@@ -34,6 +34,12 @@
         </nav>
     </header>
     <main>
+        {% if error != '' %}
+        <div class="alert alert-dismissible alert-danger">
+            <strong>{{ error }}</strong>
+            {{ form.non_form_errors }}
+        </div>
+        {% endif %}
         <h2 style="margin: 20px 0;">Добавление нового агента</h2>
         <div class="container col-md-10">
             <form method="POST">

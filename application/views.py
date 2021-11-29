@@ -126,19 +126,23 @@ def add_client(request):
 
 
 def add_agent(request):
-    error = ''
+    error= ''
     if request.method == 'POST':
-        form = AgentCreateForm(request.POST)
-        if form.is_valid():
-            form.save()
-            worker = Worker.objects.get(user=request.user.id)
-            position = Position.objects.get(position_id=worker.position_id)
-            if position.position_id == 1:
-                return redirect('agents/agent_list')
+        check_unique = Agent.objects.filter(agent_fio=request.POST['agent_fio'],  organization_id=request.POST['organization_id']).exists()
+        if not check_unique:
+            form = AgentCreateForm(request.POST)
+            if form.is_valid():
+                form.save()
+                worker = Worker.objects.get(user=request.user.id)
+                position = Position.objects.get(position_id=worker.position_id)
+                if position.position_id == 1:
+                    return redirect('agents/agent_list')
+                else:
+                    return redirect('workers/worker_list')
             else:
-                return redirect('workers/worker_list')
+                error = 'Форма заполнена некорректно'
         else:
-            error = 'Форма заполнена некорректно'
+            error = 'Агент с такими же данными уже существует'
 
     organizations = Organization.objects.all()
     form = AgentCreateForm()
@@ -146,6 +150,7 @@ def add_agent(request):
     context = {
         'form': form,
         'organizations': organizations,
+        'error': error
     }
 
     return render(request, 'agents/add_agent.html', context)
@@ -166,7 +171,7 @@ class AgentCardView(UpdateView):
 
 
 def add_worker(request):
-
+    error= ''
     if request.method == 'POST':
         check_unique = Worker.objects.filter(worker_fio=request.POST['worker_fio'], date_birthday=request.POST['date_birthday'], position=request.POST['position']).exists()
         if not check_unique:
@@ -199,6 +204,7 @@ def add_worker(request):
         'form': form,
         'positions': positions,
         'organizations': organizations,
+        'error': error
     }
 
     return render(request, 'workers/add_worker.html', context)
