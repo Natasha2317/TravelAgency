@@ -2,6 +2,10 @@
     text-align: end;
     margin-top: 1%;
 }
+.back{
+    text-align: start;
+    margin-top: 5%;
+}
 h2, h3{
     text-align: center;
 }

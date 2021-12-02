@@ -16,12 +16,9 @@ class Account(models.Model):
 
 class Agent(models.Model):
     agent_id = models.AutoField(primary_key=True)
-    organization_id = models.IntegerField()
+    organization = models.ForeignKey('Organization', models.DO_NOTHING)
     agent_fio = models.CharField(max_length=255)
     agent_name = models.CharField(max_length=50)
-
-    def get_absolute_url(self):
-            return f'/agent_list'
 
     class Meta:
         managed = False
@@ -403,8 +400,6 @@ class Worker(models.Model):
     photo = models.ImageField(blank=True, null=True)
     user = models.OneToOneField(AuthUser, models.CASCADE, db_column='user', blank=True, null=True)
 
-    def get_absolute_url(self):
-            return f'/worker_list'
 
     class Meta:
         managed = False

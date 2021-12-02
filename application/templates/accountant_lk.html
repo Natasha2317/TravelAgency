@@ -17,7 +17,7 @@
                 <div class="collapse navbar-collapse" id="navbarText">
                     <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                         <li class="nav-item">
-                            <a class="nav-link" href="#">Главная</a>
+                            <a class="nav-link" href="#"></a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link active" aria-current="page" href="{% url 'account' %}">Личный кабинет</a>
@@ -31,8 +31,11 @@
         </nav>
     </header>
     <main>
-        <div class="container name_user" style="margin-right: 1%;">
+        <div class="container">
             <div class="row">
+                <div class="col align-self-start back" style="margin-top: 20px;">
+                    <a class="btn btn-outline-dark mb-2 btn-sm" href="{% url 'authorization' %}">Назад</a>
+                </div>
                 <div class="col align-self-end">
                   <p class="name_user">Бухгалтер - {{ worker.worker_name }}</p>
                 </div>

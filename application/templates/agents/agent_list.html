@@ -18,7 +18,7 @@
                 <div class="collapse navbar-collapse" id="navbarText">
                     <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                         <li class="nav-item">
-                            <a class="nav-link" href="#">Главная</a>
+                            <a class="nav-link" href="#"></a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link active" aria-current="page" href="{% url 'account' %}">Личный кабинет</a>
@@ -38,20 +38,21 @@
                 </div>
             </div>
         </div>
+        <div class="container col-md-10" style="margin: 25px 20px;">
+            <a class="btn btn-outline-dark mb-2 btn-sm" href="{% url 'account' %}">Назад</a>
+            <a class="btn btn-outline-dark mb-2 btn-sm" href="{% url 'account' %}">Главное меню</a>
+        </div>
         <h2 style="margin: 20px 0;">Агенты</h2>
         <div class="container col-md-10">
             <div class="row">
                <div class="col">
                <form action="" method="get">
                   <div class="input-group mb-3">
-                    <input type="text" class="form-control" name="q" placeholder="Поиск агента" aria-label="Recipient's username" aria-describedby="button-addon2">
+                    <input type="text" class="form-control" name="q" placeholder="Поиск агента" aria-label="Recipient's username" aria-describedby="button-addon2" value="{{search}}">
                     <input class="btn btn-outline-secondary" name="search" value="Поиск" type="submit" id="button-addon2"></input>
                   </div>
                   </form>
                </div>
-               <div class="col-3">
-                    <a href="{% url 'agents/add_agent' %}" class="btn btn btn-success" id="button-addon2">Добавить нового агента</a>
-                </div>
             </div>
         </div>
             <div class="container col-md-10">
@@ -60,8 +61,6 @@
                     <tr>
                     <th scope="col">#</th>
                     <th scope="col">ФИО</th>
-                    <th scope="col"></th>
-                    <th scope="col"></th>
                     </tr>
                 </thead>
                     {% for agent in agents %}
@@ -69,8 +68,6 @@
                         <tr>
                             <th scope="row">{{agent.agent_id}}</th>
                             <td>{{agent.agent_fio}}</td>
-                            <td><a class="btn btn-primary" href="{% url 'agents/agent_card' agent.agent_id %}" role="button">Изменить</a></td>
-                            <td><a class="btn btn-danger" href="#" role="button">Удалить</a></td>
                         </tr>
                     </tbody>
                     {% endfor %}

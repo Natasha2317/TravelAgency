@@ -20,7 +20,7 @@
                 <div class="collapse navbar-collapse" id="navbarText">
                     <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                         <li class="nav-item">
-                            <a class="nav-link" href="#">Главная</a>
+                            <a class="nav-link" href="#"></a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link active" aria-current="page" href="{% url 'account' %}">Личный кабинет</a>
@@ -40,18 +40,22 @@
                 {{ form.non_form_errors }}
             </div>
         {% endif %}
+        <div class="container col-md-10" style="margin: 25px 20px;">
+          <a class="btn btn-outline-dark mb-2 btn-sm" href="{% url 'workers/worker_list' %}">Назад</a>
+          <a class="btn btn-outline-dark mb-2 btn-sm" href="{% url 'account' %}">Главное меню</a>
+        </div>
         <h2 style="margin: 20px 0;">Добавление нового сотрудника</h2>
         <div class="container col-md-10">
             <form method="POST" enctype="multipart/form-data">
                 {% csrf_token %}
                 <label for="name" class="form-label">Имя</label>
-                {{ form.worker_name|as_crispy_field }}<br>
+                <input type="text" placeholder="Имя" name="worker_name" id="name" value="{{ init.worker_name }}" required class="mb-3 form-control"><br>
                 <label for="fio" class="form-label">ФИО</label>
-                {{ form.worker_fio|as_crispy_field }}<br>
+                <input type="text" placeholder="ФИО" name="worker_fio" id="fio" value="{{ init.worker_fio }}" required class="mb-3 form-control"><br>
                 <label for="dob" class="form-label">Дата рождения</label>
-                <input type="date" name="date_birthday" id="dob" class="mb-3 form-control"><br>
+                <input type="date" name="date_birthday" id="dob" value="{{ init.date_birthday|date:"Y-m-d"  }}" required class="mb-3 form-control"><br>
                 <label for="organization" class="form-label">Организация</label>
-                <select class="form-select mb-3" id="organization" name="organization">
+                <select class="form-select mb-3" id="organization" name="organization" value="{{ init.organization }}">
                     {% for organization in organizations %}
                         <option value="{{organization.organization_id}}">
                             {{ organization.organization_name }}
@@ -61,7 +65,7 @@
                 <label for="position" class="form-label">Должность</label>
                 <select class="form-select mb-3" id="position" name="position">
                     {% for position in positions %}
-                        <option value="{{position.position_id}}">
+                        <option {% if position == init.position %} selected {% endif %} value="{{position.position_id}}">
                             {{ position.position_name }}
                         </option>
                     {% endfor %}

@@ -17,22 +17,10 @@
                 <div class="collapse navbar-collapse" id="navbarText">
                     <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                         <li class="nav-item">
-                            <a class="nav-link" href="#">Главная</a>
+                            <a class="nav-link" href="#"></a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link active" aria-current="page" href="{% url 'account' %}">Личный кабинет</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#">Компания</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#">Договоры</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#">Отчеты</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#">Гостиницы</a>
                         </li>
                     </ul>
                     <a class="navbar-text" href="{% url 'logout' %}">
@@ -42,9 +30,12 @@
             </div>
         </nav>
     </header>
-    <main>
-        <div class="container name_user" style="margin-right: 1%;">
+    <main>     
+        <div class="container">
             <div class="row">
+                <div class="col align-self-start back" style="margin-top: 20px;">
+                    <a class="btn btn-outline-dark mb-2 btn-sm" href="{% url 'authorization' %}">Назад</a>
+                </div>
                 <div class="col align-self-end">
                   <p class="name_user">Менеджер - {{ worker.worker_name }}</p>
                 </div>
@@ -55,39 +46,16 @@
                 <div class="col">
                     <div class="list-group">
                         <button type="button" class="list-group-item list-group-item-success">Компания</button>
-                        <button type="button" class="list-group-item list-group-item-action">Организации</button>
                         <a href="{% url 'agents/agent_list' %}" class="list-group-item list-group-item-action">Агенты</a>
                     </div>
                 </div>
                 <div class="col">
-                <div class="list-group">
+                    <div class="list-group">
                         <button type="button" class="list-group-item list-group-item-success">Договоры</button>
-                        <button type="button" class="list-group-item list-group-item-action">Предварительные соглашения</button>
-                        <button type="button" class="list-group-item list-group-item-action">Клиентские договоры</button>
-                        <button type="button" class="list-group-item list-group-item-action">Список ваучеров</button>
                         <a href="{% url 'clients/client_list' %}" class="list-group-item list-group-item-action">Клиенты</a>
                     </div>
                 </div>
             </div>
-            <br>
-            <div class="row">
-                <div class="col">
-                    <div class="list-group">
-                        <button type="button" class="list-group-item list-group-item-success">Отчеты</button>
-                        <button type="button" class="list-group-item list-group-item-action">Динамика продаж</button>
-                        <button type="button" class="list-group-item list-group-item-action">Неоплаченные договоры</button>
-                        <button type="button" class="list-group-item list-group-item-action">Эффективность работы филиалов и агентов</button>
-                    </div>
-                </div>
-                <div class="col">
-                    <div class="list-group">
-                        <button type="button" class="list-group-item list-group-item-success">Гостиницы</button>
-                        <button type="button" class="list-group-item list-group-item-action">Страны мира</button>
-                        <button type="button" class="list-group-item list-group-item-action">Города мира</button>
-                        <button type="button" class="list-group-item list-group-item-action">Гостницы</button>
-                        <button type="button" class="list-group-item list-group-item-action">Виды номеров гостиниц</button>
-                    </div>
-                </div>
             </div>
         </div>
     </main>

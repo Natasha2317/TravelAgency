@@ -17,7 +17,7 @@
                 <div class="collapse navbar-collapse" id="navbarText">
                     <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                         <li class="nav-item">
-                            <a class="nav-link" href="#">Главная</a>
+                            <a class="nav-link" href="#"></a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link active" aria-current="page" href="{% url 'account' %}">Личный кабинет</a>
@@ -30,10 +30,13 @@
             </div>
         </nav>
     </header>
-    <main>
-        <div class="container name_user" style="margin-right: 1%;">
+    <main>     
+        <div class="container">
             <div class="row">
-                <div class="col align-self-end">
+                <div class="col align-self-start back" style="margin-top: 20px;">
+                    <a class="btn btn-outline-dark mb-2 btn-sm" href="{% url 'authorization' %}">Назад</a>
+                </div> 
+                <div class="col align-self-end name_user">
                   <p class="name_user">Администратор - {{ worker.worker_name }}</p>
                 </div>
             </div>
@@ -43,34 +46,13 @@
                 <div class="col">
                     <div class="list-group">
                         <button type="button" class="list-group-item list-group-item-success">Механизм бизнес-процессов</button>
-                        <button type="button" class="list-group-item list-group-item-action">Оформление поездки</button>
-                        <button type="button" class="list-group-item list-group-item-action">Список задач пользователей</button>
-                        <button type="button" class="list-group-item list-group-item-action">Регистр адресации</button>
                         <a href="{% url 'workers/worker_list' %}" class="list-group-item list-group-item-action">Сотрудники</a>
-                        <button type="button" class="list-group-item list-group-item-action">Роли сотрудников</button>
-                    </div>
-                </div>
-                <div class="col">
-                <div class="list-group">
-                        <button type="button" class="list-group-item list-group-item-success">Обмен с филиалами</button>
-                        <button type="button" class="list-group-item list-group-item-action">Загрузить данные филиалов</button>
-                        <button type="button" class="list-group-item list-group-item-action">Обмен с филиалами</button>
-                    </div>
-                </div>
-            </div>
-            <br>
-            <div class="row">
-                <div class="col">
-                    <div class="list-group">
-                        <button type="button" class="list-group-item list-group-item-success">Сервис</button>
-                        <button type="button" class="list-group-item list-group-item-action">Название компании</button>
-                        <button type="button" class="list-group-item list-group-item-action">Путь к папке с сообщениями</button>
                     </div>
                 </div>
                 <div class="col">
                     <div class="list-group">
-                        <button type="button" class="list-group-item list-group-item-success">См. также</button>
-                        <button type="button" class="list-group-item list-group-item-action">Общий журнал документов</button>
+                        <button type="button" class="list-group-item list-group-item-success">Договоры</button>
+                        <a href="{% url 'clients/client_list' %}" class="list-group-item list-group-item-action">Клиенты</a>
                     </div>
                 </div>
             </div>

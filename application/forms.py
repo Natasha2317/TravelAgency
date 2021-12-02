@@ -4,6 +4,8 @@ from .models import *
 from django.forms import ModelForm, TextInput, DateTimeInput, DateInput
 from django.forms.widgets import ClearableFileInput, CheckboxInput
 from PIL import Image
+from django.utils.safestring import mark_safe
+from django.utils.translation import ugettext_lazy
 User = get_user_model()
 
 
@@ -78,10 +80,33 @@ class AgentCreateForm(ModelForm):
 
     class Meta:
         model = Agent
-        fields = ['agent_name', 'agent_fio', 'organization_id']
+        fields = ['agent_name', 'agent_fio', 'organization']
 
 
 class UserCreateForm(ModelForm):
     class Meta:
         model = AuthUser
         fields = ['password', 'last_login', 'username', 'date_joined', 'is_superuser','is_staff', 'is_active']
+
+
+class MyClearableFileInput(ClearableFileInput):
+    initial_text = 'Текущая фотография'
+    input_text = 'Изменить фотографию'
+    initial_text = ugettext_lazy('Текущая фотография')
+    input_text = ugettext_lazy('Изменить фотографию')
+    template_with_initial = u'%(initial)s %(clear_template)s %(input_text)s: %(input)s'
+    url_markup_template = '<a href="{0}">{1}</a>'
+    clear_checkbox_label = 'Удалить фотографию'
+    upload_to = 'static/images'
+
+    def render(self, name, value, attrs=None, renderer=None):
+        substitutions = {
+            'initial_text': self.initial_text,
+            'clear_template': '',
+            'input_text': self.input_text,
+        }
+        template = '%(input)s'
+        substitutions['input'] = super(MyClearableFileInput, self).render(name, value, attrs)
+
+
+        return mark_safe(template % substitutions)

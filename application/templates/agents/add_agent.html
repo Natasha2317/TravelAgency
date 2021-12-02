@@ -20,7 +20,7 @@
                 <div class="collapse navbar-collapse" id="navbarText">
                     <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                         <li class="nav-item">
-                            <a class="nav-link" href="#">Главная</a>
+                            <a class="nav-link" href="#"></a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link active" aria-current="page" href="{% url 'account' %}">Личный кабинет</a>
@@ -40,18 +40,22 @@
             {{ form.non_form_errors }}
         </div>
         {% endif %}
+        <div class="container col-md-10" style="margin: 25px 20px;">
+            <a class="btn btn-outline-dark mb-2 btn-sm" href="{% url 'workers/worker_list' %}">Назад</a>
+            <a class="btn btn-outline-dark mb-2 btn-sm" href="{% url 'workers/worker_list' %}">Главное меню</a>
+        </div>
         <h2 style="margin: 20px 0;">Добавление нового агента</h2>
         <div class="container col-md-10">
             <form method="POST">
                 {% csrf_token %}
                 <label for="name" class="form-label">Имя</label>
-                {{ form.agent_name|as_crispy_field }}<br>
+                <input type="text" placeholder="Имя" name="agent_name" id="name" value="{{ init.agent_name }}" required class="mb-3 form-control"><br>
                 <label for="fio" class="form-label">ФИО</label>
-                {{ form.agent_fio|as_crispy_field }}<br>
+                <input type="text" placeholder="Имя" name="agent_fio" id="name" value="{{ init.agent_fio }}" required class="mb-3 form-control"><br>
                 <label for="organization" class="form-label">Организация</label>
-                <select class="form-select mb-3" id="organization" name="organization_id">
+                <select class="form-select mb-3" id="organization" name="organization">
                     {% for organization in organizations %}
-                        <option value="{{organization.organization_id}}">
+                        <option {% if organization == init.organization %} selected {% endif %} value="{{organization.organization_id}}">
                             {{ organization.organization_name }}
                         </option>
                     {% endfor %}

@@ -20,7 +20,7 @@
                 <div class="collapse navbar-collapse" id="navbarText">
                     <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                         <li class="nav-item">
-                            <a class="nav-link" href="#">Главная</a>
+                            <a class="nav-link" href="#"></a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link active" aria-current="page" href="{% url 'account' %}">Личный кабинет</a>
@@ -34,22 +34,58 @@
         </nav>
     </header>
     <main>
+        {% if messages %}
+        <div class="alert alert-warning">
+        <div class="container text-center">
+            {% for message in messages %}
+            <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+            {% endfor %}
+        </div>
+        </div>
+        {% endif %}
+        <div class="container col-md-10" style="margin: 25px 20px;">
+            <a class="btn btn-outline-dark mb-2 btn-sm" href="{% url 'workers/worker_list' %}">Назад</a>
+            <a class="btn btn-outline-dark mb-2 btn-sm" href="{% url 'account' %}">Главное меню</a>
+          </div>
         <h2 style="margin: 20px 0;">Карточка сотрудника ({{worker.worker_name}})</h2>
         <div class="container col-md-6">
-           <form method="POST">
+           <form method="POST" enctype="multipart/form-data">
                 {% csrf_token %}
                 <label for="name" class="form-label">Имя</label>
-                {{ form.worker_name|as_crispy_field }}
+                <input type="text" placeholder="Имя" name="worker_name" id="name" value="{{ worker.worker_name }}" required class="mb-3 form-control">
                 <label for="fio" class="form-label">ФИО</label>
-                {{ form.worker_fio|as_crispy_field }}
+                <input type="text" placeholder="ФИО" name="worker_fio" id="fio" value="{{ worker.worker_fio }}" required class="mb-3 form-control">
                 <label for="dob" class="form-label">Дата рождения</label>
-                <input type="date" name="date_birthday" id="dob" value="{{ worker.date_birthday|date:"Y-m-d" }}" class="mb-3 form-control"><br>
+                <input type="date" name="date_birthday" id="dob" value="{{ worker.date_birthday|date:"Y-m-d" }}" class="mb-3 form-control">
+                <label for="organization" class="form-label">Организация</label>
+                <select class="form-select mb-3" id="organization" name="organization" value="{{ worker.organization }}">
+                    {% for organization in organizations %}
+                        <option {% if organization == worker.organization %} selected {% endif %} value="{{organization.organization_id}}">
+                            {{ organization.organization_name }}
+                        </option>
+                    {% endfor %}
+                </select>
+                <label for="position" class="form-label">Должность</label>
+                <select class="form-select mb-3" id="position" name="position">
+                    {% for position in positions %}
+                        <option {% if position == worker.position %} selected {% endif %} value="{{position.position_id}}">
+                            {{ position.position_name }}
+                        </option>
+                    {% endfor %}
+                </select>
                 {% if worker.photo %}
                 <label for="photo" class="form-label">Фото</label>
                 <div>
                     <img src="{{ worker.photo.url }}" alt="фотография сотрудника" style="max-width: 100%;"><br>
                     <a href="{{ worker.photo.url }}" download="сотрудник" class="btn btn-secondary btn-sm mt-2">Скачать фотографию</a>
+                    <a class="btn btn-primary" href="{% url 'delete_image' worker.worker_id %}" role="button">Удалить</a>
                 </div>
+                {% endif %}
+                {% if worker.photo == NULL or worker.photo == '' %}
+                <p>У сотрудника нет фотографии</p>
+                    <div class="input-group mb-3">
+                        <input type="file" class="form-control" placeholder="Фотография сотрудника" name="photo" aria-describedby="button-addon1">
+                    </div>
                 {% endif %}
                 <br>
             <input name="account_in" type="submit" value="Сохранить" class="btn btn-success">
