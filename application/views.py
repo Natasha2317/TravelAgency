@@ -126,7 +126,8 @@ def add_client(request):
     if request.method == 'POST':
         form = ClientCreateForm(request.POST)
         if form.is_valid():
-            form.save()
+            with transaction.atomic():
+                form.save()
             return redirect('clients/client_list')
         else:
             error = 'Форма заполнена некорректно'
@@ -198,23 +199,6 @@ def worker_card(request, pk):
                                                              'organizations': organizations,
                                                              'error': error,})
 
-# def delete_photo(request, pk):
-#     error = ''
-#     person = Worker.objects.get(photo=pk)
-#     if request.method == 'POST':
-#         form = WorkerCreateForm(request.POST, request.FILES, instance=person)
-#         if form.is_valid():
-#                 worker_instance = form.save(commit=False)
-#                 worker_instance.save()
-#                 return redirect('workers/worker_list')
-#         else:
-#             error = 'Форма заполнена некорректно'
-
-#     positions = Position.objects.all()
-#     organizations = Organization.objects.all()
-#     return render(request, 'workers/worker_card.html', {'worker': person, 'positions': positions,
-#                                                              'organizations': organizations,
-#                                                              'error': error,})
 
 
 def agent_card(request, pk):
@@ -223,9 +207,11 @@ def agent_card(request, pk):
     if request.method == 'POST':
         form = AgentCreateForm(request.POST, instance=person)
         if form.is_valid():
+            with transaction.atomic():
                 agent_instance = form.save(commit=False)
                 agent_instance.save()
-                return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+                messages.add_message(request, messages.INFO, 'Сотрудник успешно изменён')
+            return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
         else:
             error = 'Форма заполнена некорректно'
 
