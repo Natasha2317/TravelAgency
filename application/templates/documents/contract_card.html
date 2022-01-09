@@ -1,0 +1,199 @@
+{% load static %}
+{% load crispy_forms_tags %}
+<!doctype html>
+<html leng="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Мечта путешественника</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'lk.css' %}">
+    <script src='https://kit.fontawesome.com/a076d05399.js' crossorigin='anonymous'></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <script defer src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+</head>
+<body style="font-family:'Tangerine', verdana;">
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="#">Мечта путешественника</a>
+                <div></div>
+                <div class="collapse navbar-collapse" id="navbarText">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                        <li class="nav-item">
+                            <a class="nav-link" href="#"></a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" aria-current="page" href="{% url 'account' %}">Личный кабинет</a>
+                        </li>
+                    </ul>
+                    <a class="navbar-text" href="{% url 'logout' %}">
+                        Выйти
+                    </a>
+                </div>
+            </div>
+        </nav>
+    </header>
+    <main>
+        {% if messages %}
+        <div class="alert alert-warning">
+        <div class="container text-center">
+            {% for message in messages %}
+            <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+            {% endfor %}
+        </div>
+        </div>
+        {% endif %}
+        <div class="container col-md-10" style="margin: 25px 20px;">
+            <a class="btn btn-outline-dark mb-2 btn-sm" href="{% url 'workers/worker_list' %}">Назад</a>
+            <a class="btn btn-outline-dark mb-2 btn-sm" href="{% url 'account' %}">Главное меню</a>
+          </div>
+        <h3 style="margin: 20px 0;">Договор {{contract.contract_number}} от {{contract.contract_date|date:"Y.m.d h:m:s"}}</h3>
+        <div class="container col-md-6" style="margin-top: 50px;">
+           <form method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                <label for="number" class="form-label">Номер</label>
+                <input type="text" placeholder="Номер договора" name="contract_number" value="{{contract.contract_number}}" id="number" required class="mb-3 form-control"><br>
+                <label for="date" class="form-label">Дата</label>
+                <input type="date" placeholder="Дата заключения договора" name="contract_date" value="{{contract.contract_date|date:"Y-m-d"}}" id="date" required class="mb-3 form-control"><br>
+                <h5>Даты поездки</h5><br>
+                <div class="container">
+                    <div class="row">
+                        <div class="col">
+                          <label for="start" class="form-label">Дата начала</label>
+                          <input type="date" name="date_start" value="{{agreement.date_start|date:"Y-m-d"}}" id="start" required class="mb-3 form-control">
+                        </div>
+                        <div class="col">
+                          <label for="end" class="form-label">Дата окончания</label>
+                          <input type="date" name="date_end" value="{{agreement.date_end|date:"Y-m-d"}}" id="end" required class="mb-3 form-control">
+                        </div>
+                    </div>
+                </div>
+                <label for="organization" class="form-label">Организация</label>
+                <select class="form-select mb-3" id="organization" name="organization">
+                    {% for organization in organizations %}
+                        <option {% if organization == contract.organization %} selected {% endif %} value="{{organization.organization_id}}">
+                            {{ organization.organization_name }}
+                        </option>
+                    {% endfor %}
+                </select>
+                <label for="client" class="form-label">Клиент</label>
+                <select class="form-select mb-3" id="client" name="client">
+                    {% for client in clients %}
+                        <option {% if client.client_id == get_client %} selected {% endif %} value="{{client.client_id}}">
+                            {{client.client_fio}}
+                        </option>
+                    {% endfor %}
+                </select>
+                <label for="agent" class="form-label">Агент</label>
+                <select class="form-select mb-3" id="agent" name="agent">
+                    {% for item in agent_use %}
+                        {% for agent in agents %}
+                            <option {% if agent.agent_id == item.agent_id %} selected {% endif %} value="{{agent.agent_id}}">
+                                {{ agent.agent_fio }}
+                            </option>
+                        {% endfor %}
+                    {% endfor %}
+                </select>
+                <ul class="nav nav-tabs">
+                    <li class="nav-item">
+                        <a class="nav-link active" data-bs-toggle="tab" href="#tourists">Участники поездки</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-bs-toggle="tab" href="#route">Маршрут поездки</a>
+                    </li>
+                </ul>
+                <div id="myTabContent" class="tab-content">
+                    <div class="tab-pane active" id="tourists">
+                        <table class="table table-success">
+                        <thead>
+                            <tr>
+                            <th scope="col">ФИО</th>
+                            <th scope="col"></th>
+                            <th scope="col"></th>
+                            <th scope="col"></th>
+                            </tr>
+                        </thead>
+                            {% for item in array %}
+                                {% for client in clients %}
+                                {% if item == client.client_id%}
+                                <tbody>
+                                    <tr>
+                                        <td>{{client.client_fio}}</td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                </tbody>
+                                {% endif %}
+                                {% endfor %}
+                            {% endfor %}
+                        </table>
+                    </div>
+                    <div class="tab-pane fade" id="route">
+                        <table class="table table-success">
+                        <thead>
+                            <tr>
+                            <th scope="col">Город</th>
+                            <th scope="col">Гостиница</th>
+                            <th scope="col">Вид номера</th>
+                            <th scope="col">Дата начала</th>
+                            <th scope="col">Дата окончания</th>
+                            </tr>
+                        </thead>
+                            {% for item in array_routes %}
+                            {% for route in routes %}
+                            {% for hotel in hotels %}
+                            {% for city in cities %}
+                            {% for room_type in room_types %}
+                                {% if item == route.route_id %}
+                                {% if route.hotel_id == hotel.hotel_id %}
+                                {% if hotel.city_id == city.city_id %}
+                                {% if route.room_type_id == room_type.room_type_id %}
+                                <tbody>
+                                    <tr>
+                                        <td>{{city.city_name}}</td>
+                                        <td>{{hotel.hotel_name}}</td>
+                                        <td>{{room_type.room_type_name}}</td>
+                                        <td>{{route.check_in_date|date:"Y-m-d"}}</td>
+                                        <td>{{route.departure_date|date:"Y-m-d"}}</td>
+                                    </tr>
+                                </tbody>
+                                {% endif %}
+                                {% endif %}
+                                {% endif %}
+                                {% endif %}
+                            {% endfor %}
+                            {% endfor %}
+                            {% endfor %}
+                            {% endfor %}
+                            {% endfor %}
+                        </table>
+                    </div>
+                </div>
+                <div class="container">
+                    <div class="row">
+                        <div class="col">
+                          <label for="currency" class="form-label">Валюта</label>
+                          <select class="form-select mb-3" id="currency" name="currency">
+                            {% for item in currency %}
+                                <option {% if item == currency_card.currency_code %} selected {% endif %} value="{{item.currency_code}}">
+                                    {{ item.currency_name }}
+                                </option>
+                            {% endfor %}
+                          </select>
+                        </div>
+                        <div class="col">
+                          <label for="sum" class="form-label">Сумма:</label>
+                          <input type="number" name="sum" value="{{get_currency_amount}}" id="sum" required class="mb-3 form-control">
+                        </div>
+                    </div>
+                </div>
+            <input name="account_in" type="submit" value="Сохранить" class="btn btn-success">
+            </form>
+        </div>
+    </main>
+    <footer></footer>
+</body>
+</html>
+
+

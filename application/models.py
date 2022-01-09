@@ -27,7 +27,7 @@ class Agent(models.Model):
 
 class Agreement(models.Model):
     agreement_id = models.AutoField(primary_key=True)
-    number_agreement = models.CharField(max_length=50)
+    agreement_number = models.CharField(max_length=50)
     worker = models.ForeignKey('Worker', models.DO_NOTHING)
     date_agreement = models.DateTimeField()
     organization = models.ForeignKey('Organization', models.DO_NOTHING)
@@ -36,7 +36,6 @@ class Agreement(models.Model):
     numbers_tourist = models.IntegerField()
     date_start = models.DateField()
     date_end = models.DateField()
-    city_in_agreement = models.ForeignKey('CityInAgreement', models.DO_NOTHING)
 
     class Meta:
         managed = False
@@ -125,9 +124,9 @@ class City(models.Model):
 
 
 class CityInAgreement(models.Model):
-    city_in_agreement_id = models.IntegerField(primary_key=True)
+    city_in_agreement_id = models.AutoField(primary_key=True)
     city = models.ForeignKey(City, models.DO_NOTHING)
-    agreement_id = models.IntegerField()
+    agreement = models.ForeignKey(Agreement, models.DO_NOTHING)
 
     class Meta:
         managed = False
@@ -174,7 +173,6 @@ class Contract(models.Model):
     contract_date = models.DateTimeField()
     currency_code = models.ForeignKey('Currency', models.DO_NOTHING, db_column='currency_code')
     amount = models.IntegerField()
-    route_in_contract = models.ForeignKey('RouteInContract', models.DO_NOTHING)
     agreement = models.ForeignKey(Agreement, models.DO_NOTHING)
 
     class Meta:
@@ -341,7 +339,7 @@ class Route(models.Model):
 class RouteInContract(models.Model):
     route_in_contract_id = models.AutoField(primary_key=True)
     route = models.ForeignKey(Route, models.DO_NOTHING)
-    contract_id = models.IntegerField()
+    contract = models.ForeignKey(Contract, models.DO_NOTHING)
 
     class Meta:
         managed = False
@@ -358,14 +356,14 @@ class Tour(models.Model):
         db_table = 'tour'
 
 
-class TouristInVoucher(models.Model):
-    tourist_in_voucher_id = models.AutoField(primary_key=True)
+class TouristInContract(models.Model):
+    tourist_in_contract_id = models.AutoField(primary_key=True)
     tourist = models.ForeignKey(Client, models.DO_NOTHING)
-    voucher_id = models.IntegerField()
+    contract = models.ForeignKey(Contract, models.DO_NOTHING)
 
     class Meta:
         managed = False
-        db_table = 'tourist_in_voucher'
+        db_table = 'tourist_in_contract'
 
 
 class Transport(models.Model):
@@ -381,7 +379,6 @@ class Voucher(models.Model):
     voucher_id = models.AutoField(primary_key=True)
     client = models.ForeignKey(Client, models.DO_NOTHING)
     transport = models.ForeignKey(Transport, models.DO_NOTHING)
-    tourist_in_voucher = models.ForeignKey(TouristInVoucher, models.DO_NOTHING)
     transfer = models.CharField(max_length=4)
     food = models.CharField(max_length=11)
 

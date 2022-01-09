@@ -3,6 +3,7 @@ from django.contrib.auth import get_user_model
 from .models import *
 from django.forms import ModelForm, TextInput, DateTimeInput, DateInput
 from django.forms.widgets import ClearableFileInput, CheckboxInput
+from django_select2.forms import ModelSelect2Widget
 from PIL import Image
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy
@@ -89,24 +90,25 @@ class UserCreateForm(ModelForm):
         fields = ['password', 'last_login', 'username', 'date_joined', 'is_superuser','is_staff', 'is_active']
 
 
-class MyClearableFileInput(ClearableFileInput):
-    initial_text = 'Текущая фотография'
-    input_text = 'Изменить фотографию'
-    initial_text = ugettext_lazy('Текущая фотография')
-    input_text = ugettext_lazy('Изменить фотографию')
-    template_with_initial = u'%(initial)s %(clear_template)s %(input_text)s: %(input)s'
-    url_markup_template = '<a href="{0}">{1}</a>'
-    clear_checkbox_label = 'Удалить фотографию'
-    upload_to = 'static/images'
-
-    def render(self, name, value, attrs=None, renderer=None):
-        substitutions = {
-            'initial_text': self.initial_text,
-            'clear_template': '',
-            'input_text': self.input_text,
-        }
-        template = '%(input)s'
-        substitutions['input'] = super(MyClearableFileInput, self).render(name, value, attrs)
+class AgreementCreateForm(ModelForm):
+    class Meta:
+        model = Agreement
+        fields = ['agreement_number', 'worker', 'date_agreement', 'organization', 'agent', 'client', 'numbers_tourist', 'date_start', 'date_end']
 
 
-        return mark_safe(template % substitutions)
+class CityAgreementCreateForm(ModelForm):
+    class Meta:
+        model = CityInAgreement
+        fields = ['city_in_agreement_id', 'city', 'agreement']
+
+
+class ContractCreateForm(ModelForm):
+    class Meta:
+        model = Contract
+        fields = ['contract_number', 'worker', 'contract_date', 'organization', 'currency_code', 'amount', 'agreement']
+
+
+class TouristInContractForm(ModelForm):
+    class Meta:
+        model = TouristInContract
+        fields = ['tourist_in_contract_id', 'tourist', 'contract']
