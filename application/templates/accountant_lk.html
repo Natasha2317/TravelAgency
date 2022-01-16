@@ -41,6 +41,39 @@
                 </div>
             </div>
         </div>
+        <div class="container col-md-10 lists">
+            <div class="row">
+                <div class="col">
+                    <div class="list-group">
+                        <button type="button" class="list-group-item list-group-item-success">Валютный учет</button>
+                        <a href="#" class="list-group-item list-group-item-action">Валюты</a>
+                        <a href="#" class="list-group-item list-group-item-action">Курсы валюты</a>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="list-group">
+                        <button type="button" class="list-group-item list-group-item-success">Клиентские договоры</button>
+                        <a href="{% url 'clients/client_list' %}" class="list-group-item list-group-item-action">Клиенты</a>
+                        <a href="{% url 'documents/contract_list' %}" class="list-group-item list-group-item-action">Договоры</a>
+                        <a href="{% url 'documents/payment_list' %}" class="list-group-item list-group-item-action">Оплаты</a>
+                        <a href="#" class="list-group-item list-group-item-action">Организации</a>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="list-group">
+                        <button type="button" class="list-group-item list-group-item-success">Отчёты</button>
+                        <a href="{% url 'documents/contract_list' %}" class="list-group-item list-group-item-action">Неоплаченный договоры</a>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="list-group">
+                        <button type="button" class="list-group-item list-group-item-success">Сервисы</button>
+                        <a href="{% url 'documents/currency_list' %}" class="list-group-item list-group-item-action">Загрузка курсов валют</a>
+                    </div>
+                </div>
+            </div>
+            </div>
+        </div>
     </main>
     <footer></footer>
 </body>

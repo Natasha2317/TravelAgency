@@ -1,3 +1,4 @@
+from hashlib import pbkdf2_hmac
 from django.shortcuts import render, redirect
 from django import views
 from django.http import HttpResponseRedirect, request
@@ -14,7 +15,8 @@ from requests import get
 from bs4 import BeautifulSoup as bs
 
 
-def get_wal(request):
+def currency_list(request):
+
     headers = {
         "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
         "Host":"www.cbr.ru:443",
@@ -27,80 +29,21 @@ def get_wal(request):
     for_bs = body.text
     soup = bs(for_bs, 'html.parser')
 
+    currency_list = Currency.objects.all()
     currency = soup.find_all('td')
-    currency1 = currency[4].text
-    currency2 = currency[9].text
-    currency3 = currency[14].text
-    currency4 = currency[19].text
-    currency5 = currency[25].text
-    currency6 = currency[29].text
-    currency7 = currency[34].text
-    currency8 = currency[39].text
-    currency9 = currency[44].text
-    currency10 = currency[49].text
-    currency11 = currency[54].text
-    currency12 = currency[59].text
-    currency13 = currency[64].text
-    currency14 = currency[69].text
-    currency15 = currency[74].text
-    currency16 = currency[79].text
-    currency17 = currency[84].text
-    currency18 = currency[89].text
-    currency19 = currency[94].text
-    currency20 = currency[99].text
-    currency21 = currency[104].text
-    currency22 = currency[109].text
-    currency23 = currency[114].text
-    currency24 = currency[119].text
-    currency25 = currency[124].text
-    currency26 = currency[129].text
-    currency27 = currency[134].text
-    currency28 = currency[139].text
-    currency29 = currency[144].text
-    currency30 = currency[149].text
-    currency31 = currency[154].text
-    currency32 = currency[159].text
-    currency33 = currency[164].text
-    currency34 = currency[169].text
+
+    if request.method == 'POST':
+        i = 4
+        for item in currency_list:
+            Currency.objects.filter(currency_code=item.currency_code).update(course=currency[i].text.replace(',', '.'))
+            i += 5
 
     context = {
-        'currency1': currency1,
-        'currency2': currency2,
-        'currency3': currency3,
-        'currency4': currency4,
-        'currency5': currency5,
-        'currency6': currency6,
-        'currency7': currency7,
-        'currency8': currency8,
-        'currency9': currency9,
-        'currency10': currency10,
-        'currency11': currency11,
-        'currency12': currency12,
-        'currency13': currency13,
-        'currency14': currency14,
-        'currency15': currency15,
-        'currency16': currency16,
-        'currency17': currency17,
-        'currency18': currency18,
-        'currency19': currency19,
-        'currency20': currency20,
-        'currency21': currency21,
-        'currency22': currency22,
-        'currency23': currency23,
-        'currency24': currency24,
-        'currency25': currency25,
-        'currency26': currency26,
-        'currency27': currency27,
-        'currency28': currency28,
-        'currency29': currency29,
-        'currency30': currency30,
-        'currency31': currency31,
-        'currency32': currency32,
-        'currency33': currency33,
-        'currency34': currency34,
+        'currency_list': currency_list
 
     }
     return render(request, 'documents/currency_list.html', context)
+
 
 class ClientListView(views.View):
 
@@ -383,28 +326,34 @@ class ContractListView(views.View):
         }
         return render(request, 'documents/contract_list.html', context)
 
+class PaymentListView(views.View):
+
+    def get(self, request, *args, **kwargs):
+
+        payments = Payment.objects.filter()
+
+        context = {
+            'payments': payments,
+        }
+        return render(request, 'documents/payment_list.html', context)
+
 
 def add_agreement(request):
     error= ''
-
     if request.method == 'POST':
-
-        last_agreement_id = Agreement.objects.latest('agreement_id').agreement_id
         city = request.POST.get('city')
-        # agreement_id = request.POST.get('id')
-        for item in city:
-            form_city_agreement = CityAgreementCreateForm(
-                {'city': item, 'agreement_id': last_agreement_id})
+        form_city_agreement = CityAgreementCreateForm(request.POST)
         form = AgreementCreateForm(request.POST)
         worker = Worker.objects.get(user=request.user.id)
-        if form_city_agreement.is_valid() and form.is_valid():
-            city_agreement = form_city_agreement.save(commit=False)
-            form_city_agreement.save()
+        if form.is_valid():
             agreement_instance = form.save(commit=False)
-            agreement_instance.city_in_agreement_id = city_agreement
-            agreement_instance.worker = worker.worker_id
+            agreement_instance.worker_id = worker.worker_id
             agreement_instance.save()
-            return redirect('documents/agreement_list')
+            last_agreement_id = Agreement.objects.all().last().agreement_id
+            form_city_agreement = CityAgreementCreateForm(
+            {'city': city, 'agreement': last_agreement_id})
+            form_city_agreement.save()
+            return redirect('agreement_card/'+ str(last_agreement_id))
         else:
             error = str(form_city_agreement.errors) + str(form.errors)
 
@@ -429,6 +378,138 @@ def add_agreement(request):
     }
 
     return render(request, 'documents/add_agreement.html', context)
+
+
+def add_contract(request):
+    error= ''
+    agreement = Agreement.objects.all().last()
+    if request.method == 'POST':
+        form_route = RouteCreateForm(request.POST)
+        form_tourist = TouristInContractForm(request.POST)
+        form_route_in_contract = RouteInContractCreateForm(request.POST)
+        form = ContractCreateForm(request.POST)
+        worker = Worker.objects.get(user=request.user.id)
+        tourist = request.POST.get('tourist')
+        if form.is_valid():
+            contract_instance = form.save(commit=False)
+            contract_instance.worker_id = worker.worker_id
+            contract_instance.agreement_id = agreement.agreement_id
+            contract_instance.save()
+            last_contract_id = Contract.objects.all().last().contract_id
+            form_tourist = TouristInContractForm(
+                {'tourist': tourist, 'contract': last_contract_id})
+            form_tourist.save()
+            route_instance = form_route.save(commit=False)
+            route_instance.save()
+            last_route_id = Route.objects.all().last().route_id
+            form_route_in_contract = RouteInContractCreateForm(
+                {'route': last_route_id, 'contract': last_contract_id})
+            form_route_in_contract.save()
+            return redirect('contract_card/'+ str(last_contract_id))
+        else:
+            error = str(form.errors)
+
+    positions = Position.objects.all()
+    organizations = Organization.objects.all()
+    clients = Client.objects.all()
+    get_client = agreement.client_id
+    agents = Agent.objects.all()
+    form = ContractCreateForm()
+    cities = City.objects.all()
+    hotels = Hotel.objects.all()
+    countries = Country.objects.all()
+    currency = Currency.objects.all()
+    agent_use = Agent.objects.filter(agent_id=agreement.agent_id)
+    routes = Route.objects.all()
+    room_types = RoomType.objects.all()
+    city_in_agreement = CityInAgreement.objects.filter(agreement_id=agreement.agreement_id)
+
+
+
+    def get_array():
+        array = []
+        item = 0
+        while item <= len(city_in_agreement)-1:
+            if city_in_agreement[item]:
+                get_city_in_contract = city_in_agreement[item]
+                city_in_route = get_city_in_contract.city_id
+                array.append(city_in_route)
+                item += 1
+            else:
+                break
+        return array
+
+
+    context = {
+        'form': form,
+        'positions': positions,
+        'organizations': organizations,
+        'error': error,
+        'countries': countries,
+        'cities': cities,
+        'clients': clients,
+        'agents': agents,
+        'agreement': agreement,
+        'hotels': hotels,
+        'routes': routes,
+        'get_client': get_client,
+        'agent_use': agent_use,
+        'array': get_array(),
+        'currency': currency,
+        'room_types': room_types,
+        }
+
+    return render(request, 'documents/add_contract.html', context)
+
+
+def add_payment(request):
+    error= ''
+    if request.method == 'POST':
+        form = PaymentCreateForm(request.POST)
+        worker = Worker.objects.get(user=request.user.id)
+        if form.is_valid():
+            payment_instance = form.save(commit=False)
+            payment_instance.worker_id = worker.worker_id
+            last_contract_id = Contract.objects.all().last().contract_id
+            payment_instance.contract_id = last_contract_id
+            payment_instance.save()
+            return redirect('documents/payment_list')
+        else:
+            error = str(form.errors)
+
+    contract = Contract.objects.all().last()
+    contracts = Contract.objects.all()
+    # get_currency_amount = Contract.objects.all().last().amount
+    # currency = Currency.objects.all()
+    get_currency = contract.currency_code
+    currency_card = get_currency.currency_code
+    get_currency_amount = contract.amount
+    currency_card = Currency.objects.get(currency_code=currency_card)
+    get_currency_course = currency_card.course
+    payment_amount = int(get_currency_amount)*int(get_currency_course)
+    positions = Position.objects.all()
+    organizations = Organization.objects.all()
+    countries = Country.objects.all()
+    cities = City.objects.all()
+    clients = Client.objects.all()
+    agents = Agent.objects.all()
+    form = AgreementCreateForm()
+
+    context = {
+        'form': form,
+        'positions': positions,
+        'organizations': organizations,
+        'error': error,
+        'countries': countries,
+        'cities': cities,
+        'clients': clients,
+        'agents': agents,
+        'payment_amount': payment_amount,
+        'contract': contract,
+        'contracts': contracts
+    }
+
+    return render(request, 'documents/add_payment.html', context)
 
 
 def agreement_card(request, pk):
@@ -457,10 +538,10 @@ def agreement_card(request, pk):
     form = AgreementCreateForm()
     cities = City.objects.all()
     countries = Country.objects.all()
-    contract = Contract.objects.get(agreement_id=pk)
+    # contract = Contract.objects.get(agreement_id=pk)
     currency = Currency.objects.all()
-    get_currency = contract.currency_code
-    currency_card = get_currency.currency_code
+    # get_currency = contract.currency_code
+    # currency_card = get_currency.currency_code
     city_in_agreement = CityInAgreement.objects.filter(agreement=agreement.agreement_id)
     # city_ag = city_in_agreement.city_id
     # country_ag = Country.objects.get(country_id=city_ag.country)
@@ -487,7 +568,7 @@ def agreement_card(request, pk):
         'clients': clients,
         'agents': agents,
         'agreement': agreement,
-        'currency_card': currency_card,
+        # 'currency_card': currency_card,
         'currency': currency,
         'array': get_array(),
     }

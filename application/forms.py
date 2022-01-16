@@ -93,22 +93,41 @@ class UserCreateForm(ModelForm):
 class AgreementCreateForm(ModelForm):
     class Meta:
         model = Agreement
-        fields = ['agreement_number', 'worker', 'date_agreement', 'organization', 'agent', 'client', 'numbers_tourist', 'date_start', 'date_end']
+        fields = ['agreement_number', 'date_agreement', 'organization', 'agent', 'client', 'numbers_tourist', 'date_start', 'date_end']
 
 
 class CityAgreementCreateForm(ModelForm):
     class Meta:
         model = CityInAgreement
         fields = ['city_in_agreement_id', 'city', 'agreement']
+        widgets = {
+            'city' : CheckboxInput(attrs={'class': 'required checkbox form-control'}),
+        }
+
+class RouteCreateForm(ModelForm):
+    class Meta:
+        model = Route
+        fields = ['hotel', 'check_in_date', 'room_type', 'departure_date']
 
 
 class ContractCreateForm(ModelForm):
     class Meta:
         model = Contract
-        fields = ['contract_number', 'worker', 'contract_date', 'organization', 'currency_code', 'amount', 'agreement']
+        fields = ['contract_number', 'contract_date', 'organization', 'currency_code', 'amount']
 
 
 class TouristInContractForm(ModelForm):
     class Meta:
         model = TouristInContract
-        fields = ['tourist_in_contract_id', 'tourist', 'contract']
+        fields = ['tourist', 'contract']
+
+class RouteInContractCreateForm(ModelForm):
+    class Meta:
+        model = RouteInContract
+        fields = ['route', 'contract']
+
+
+class PaymentCreateForm(ModelForm):
+    class Meta:
+        model = Payment
+        fields = ['payment_number', 'payment_date', 'contract', 'amount']

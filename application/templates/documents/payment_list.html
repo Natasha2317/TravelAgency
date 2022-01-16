@@ -43,13 +43,13 @@
             <a class="btn btn-outline-dark mb-2 btn-sm" href="{% url 'account' %}">Главное меню</a>
         </div>
         <h2 style="margin: 20px 0;">Оплаты</h2>
-        <div class="container col-md-9">
+        {% comment %} <div class="container col-md-9">
              <div class="row">
                 <div class="col name_user">
                     <a href="{% url 'documents/add_agreement' %}" class="btn btn btn-success" id="button-addon2">Создать новую оплату</a>
                 </div>
             </div>
-        </div>
+        </div> {% endcomment %}
         <br>
             <div class="container col-md-9">
             <table class="table table-success">
@@ -61,11 +61,11 @@
                     <th scope="col"></th>
                     </tr>
                 </thead>
-                    {% for agreement in agreements %}
+                    {% for payment in payments %}
                         <tbody>
                             <tr>
-                                <td>{{agreement.agreement_number}}</td>
-                                <td class="rihgt_button"><a class="btn btn-primary" href="{% url 'documents/agreement_card' agreement.agreement_id %}" role="button">Изменить</a></td>
+                                <td>{{payment.payment_number}}</td>
+                                <td class="rihgt_button"><a class="btn btn-primary" href="{% url 'documents/payment_card' payment.payment_id %}" role="button">Изменить</a></td>
                                 <td></td>
                                 <td></td>
                             </tr>

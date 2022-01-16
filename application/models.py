@@ -192,6 +192,8 @@ class Country(models.Model):
 class Currency(models.Model):
     currency_code = models.IntegerField(primary_key=True)
     currency_name = models.CharField(max_length=15)
+    letter_code = models.CharField(max_length=3)
+    units = models.CharField(max_length=7)
     course = models.FloatField()
 
     class Meta:

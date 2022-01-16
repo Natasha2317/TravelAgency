@@ -34,27 +34,24 @@
         </nav>
     </header>
     <main>
-        {% if messages %}
-        <div class="alert alert-warning">
-        <div class="container text-center">
-            {% for message in messages %}
-            <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
-            {% endfor %}
-        </div>
-        </div>
+        {% if error != '' %}
+            <div class="alert alert-dismissible alert-danger">
+                <strong>{{ error }}</strong>
+                {{ form.non_form_errors }}
+            </div>
         {% endif %}
         <div class="container col-md-10" style="margin: 25px 20px;">
-            <a class="btn btn-outline-dark mb-2 btn-sm" href="{% url 'workers/worker_list' %}">Назад</a>
+            <a class="btn btn-outline-dark mb-2 btn-sm" href="{% url 'documents/contract_list' %}">Назад</a>
             <a class="btn btn-outline-dark mb-2 btn-sm" href="{% url 'account' %}">Главное меню</a>
           </div>
-        <h3 style="margin: 20px 0;">Договор {{contract.contract_number}} от {{contract.contract_date|date:"Y.m.d h:m:s"}}</h3>
-        <div class="container col-md-6" style="margin-top: 50px;">
+        <h3 style="margin: 20px 0;">Составление договора</h3>
+        <div class="container col-md-8" style="margin-top: 50px;">
            <form method="POST" enctype="multipart/form-data">
                 {% csrf_token %}
                 <label for="number" class="form-label">Номер</label>
                 <input type="text" placeholder="Номер договора" name="contract_number" value="{{contract.contract_number}}" id="number" required class="mb-3 form-control"><br>
                 <label for="date" class="form-label">Дата</label>
-                <input type="date" placeholder="Дата заключения договора" name="contract_date" value="{{contract.contract_date|date:"Y-m-d"}}" id="date" required class="mb-3 form-control"><br>
+                <input type="date" placeholder="Дата заключения договора" name="contract_date" value="{{agreement.date_agreement|date:"Y-m-d"}}" id="date" required class="mb-3 form-control"><br>
                 <h5>Даты поездки</h5><br>
                 <div class="container">
                     <div class="row">
@@ -104,35 +101,28 @@
                 </ul>
                 <div id="myTabContent" class="tab-content">
                     <div class="tab-pane active" id="tourists">
-                        <table class="table table-success">
-                        <thead>
-                            <tr>
-                            <th scope="col">ФИО</th>
-                            <th scope="col"></th>
-                            <th scope="col"></th>
-                            <th scope="col"></th>
-                            </tr>
-                        </thead>
-                            {% for item in array %}
-                                {% for client in clients %}
-                                {% if item == client.client_id%}
-                                <tbody>
-                                    <tr>
-                                        <td>{{client.client_fio}}</td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                    </tr>
-                                </tbody>
-                                {% endif %}
-                                {% endfor %}
+                        <br>
+                        <select class="form-select mb-3" id="client" name="tourist">
+                            {% for client in clients %}
+                                <option value="{{client.client_id}}">
+                                    {{client.client_fio}}
+                                </option>
                             {% endfor %}
-                        </table>
+                        </select>
                     </div>
                     <div class="tab-pane fade" id="route">
+                        <label for="country" class="form-label">Страна посещения</label>
+                        <select class="form-select mb-3" id="country" name="country">
+                            {% for country in countries %}
+                                <option value="{{country.country_id}}">
+                                    {{ country.country_name }}
+                                </option>
+                            {% endfor %}
+                        </select>
                         <table class="table table-success">
                         <thead>
                             <tr>
+                            {% comment %} <th scope="col">№</th> {% endcomment %}
                             <th scope="col">Город</th>
                             <th scope="col">Гостиница</th>
                             <th scope="col">Вид номера</th>
@@ -140,33 +130,41 @@
                             <th scope="col">Дата окончания</th>
                             </tr>
                         </thead>
-                            {% for item in array_routes %}
-                            {% for route in routes %}
-                            {% for hotel in hotels %}
-                            {% for city in cities %}
-                            {% for room_type in room_types %}
-                                {% if item == route.route_id %}
-                                {% if route.hotel_id == hotel.hotel_id %}
-                                {% if hotel.city_id == city.city_id %}
-                                {% if route.room_type_id == room_type.room_type_id %}
-                                <tbody>
-                                    <tr>
-                                        <td>{{city.city_name}}</td>
-                                        <td>{{hotel.hotel_name}}</td>
-                                        <td>{{room_type.room_type_name}}</td>
-                                        <td>{{route.check_in_date|date:"Y-m-d"}}</td>
-                                        <td>{{route.departure_date|date:"Y-m-d"}}</td>
-                                    </tr>
-                                </tbody>
-                                {% endif %}
-                                {% endif %}
-                                {% endif %}
-                                {% endif %}
-                            {% endfor %}
-                            {% endfor %}
-                            {% endfor %}
-                            {% endfor %}
-                            {% endfor %}
+                        {% for item in array %}
+                        {% for city in cities %}
+                        {% if item == city.city_id %}
+                        <tbody>
+                            <tr>
+                                {% comment %} {% if city.country_id == 1 %} {% endcomment %}
+                                {% comment %} <td><input type="checkbox" id="city" name="city">
+                                <label for="city">{{city.city_id}}</label></td> {% endcomment %}
+                                <td>{{city.city_name}}</td>
+                                <td> <select class="form-select mb-3" id="hotel" name="hotel">
+                                    {% for hotel in hotels %}
+                                        <option {% if hotel.city_id == item %} selected {% endif %} value="{{hotel.hotel_id}}">
+                                            {{ hotel.hotel_name }}
+                                        </option>
+                                    {% endfor %}
+                                </select></td>
+                                <td> <select class="form-select mb-3" id="hotel" name="room_type">
+                                    {% for room_type in room_types %}
+                                        <option value="{{room_type.room_type_id}}">
+                                            {{ room_type.room_type_name }}
+                                        </option>
+                                    {% endfor %}
+                                </select></td>
+                                <td>
+                                    <input type="datetime-local" name="check_in_date" id="start" required class="mb-3 form-control">
+                                </td>
+                                <td>
+                                    <input type="datetime-local" name="departure_date" id="end" required class="mb-3 form-control">
+                                </td>
+                                {% comment %} {% endif %} {% endcomment %}
+                            </tr>
+                        </tbody>
+                        {% endif %}
+                        {% endfor %}
+                        {% endfor %}
                         </table>
                     </div>
                 </div>
@@ -174,22 +172,21 @@
                     <div class="row">
                         <div class="col">
                           <label for="currency" class="form-label">Валюта</label>
-                          <select class="form-select mb-3" id="currency" name="currency">
+                          <select class="form-select mb-3" id="currency" name="currency_code">
                             {% for item in currency %}
-                                <option {% if item == currency_card.currency_code %} selected {% endif %} value="{{item.currency_code}}">
+                                <option value="{{item.currency_code}}">
                                     {{ item.currency_name }}
                                 </option>
                             {% endfor %}
                           </select>
                         </div>
                         <div class="col">
-                          <label for="sum" class="form-label">Сумма:</label>
-                          <input type="number" name="sum" value="{{get_currency_amount}}" id="sum" required class="mb-3 form-control">
+                          <label for="amount" class="form-label">Сумма:</label>
+                          <input type="number" name="amount" id="amount" required class="mb-3 form-control">
                         </div>
                     </div>
                 </div>
             <input name="account_in" type="submit" value="Сохранить" class="btn btn-success">
-            <a href="{% url 'documents/add_payment' %}" role="button">Перейти к оформлению оплаты</a>
             </form>
         </div>
     </main>
