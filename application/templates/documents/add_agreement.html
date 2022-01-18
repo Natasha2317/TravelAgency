@@ -85,15 +85,21 @@
                 </select>
                 <label for="numbers_tourist" class="form-label">Количество участников поездки</label>
                 <input type="number" name="numbers_tourist" id="numbers_tourist" required class="mb-3 form-control"><br>
-                <label for="country" class="form-label">Страна посещения</label>
-                <select class="form-select mb-3" id="country" name="country">
+
+                {% comment %} <label for="country" class="form-label">Страна посещения</label> {% endcomment %}
+                <select class="form-select mb-3" name="country" id="country">
                     {% for country in countries %}
                         <option value="{{country.country_id}}">
                             {{ country.country_name }}
                         </option>
                     {% endfor %}
                 </select>
-                <table class="table table-success">
+                <select class="form-select mb-3" name="city" id="city">
+                </select>
+                {% comment %} <div id="o">
+                    <input type="text" required class="mb-3 form-control"><br>
+                </div> {% endcomment %}
+                {% comment %} <table class="table table-success">
                     <thead>
                         <tr>
                         <th scope="col">№</th>
@@ -111,11 +117,34 @@
                                 </tr>
                             </tbody>
                         {% endfor %}
-                    </table>
+                    </table> {% endcomment %}
                 <button type="submit" class="btn btn-success">Сохранить</button>
             </form>
         </div>
     </main>
+    <script type="text/javascript">
+        var cities = {
+            1: ["Берлин", "Баден-Баден", "Дрезден"],
+            2: ["Милан", "Флоренция", "Рим"],
+            3: ["Мадрид", "Малага", "Валенсия"],
+            4: ["Любляна"],
+            5: ["Любляна"],
+            6: ["Свети Влас"]
+          };
+          var country = document.getElementById("country");
+          var city = document.querySelector("#city");
+          window.onload = selectCountry;
+          country.onchange = selectCountry;
+          function selectCountry(ev){
+            city.innerHTML = "";
+            var c = this.value || 1, o;
+            for(let i = 0; i < cities[c].length; i++){
+              o = new Option(cities[c][i],i,false,false);
+              city.add(o);
+            };
+            document.getElementById("o").innerHTML = d;
+          }
+    </script>
     <footer></footer>
 </body>
 </html>

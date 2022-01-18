@@ -35,7 +35,7 @@ def currency_list(request):
     if request.method == 'POST':
         i = 4
         for item in currency_list:
-            Currency.objects.filter(currency_code=item.currency_code).update(course=currency[i].text.replace(',', '.'))
+            Currency.objects.filter(currency_id=item.currency_id).update(course=currency[i].text.replace(',', '.'))
             i += 5
 
     context = {
@@ -66,8 +66,10 @@ class WorkerListView(views.View):
 
     def get(self, request, *args, **kwargs):
         search = request.GET.get("q")
+        users = AuthUser.objects.filter(is_deleted=0)
         if search == None:
-            workers = Worker.objects.filter()
+            for item in users:
+                workers = Worker.objects.filter(user_id=item.id)
             agents = Agent.objects.filter()
             search = ''
         else:
@@ -81,6 +83,31 @@ class WorkerListView(views.View):
         }
         return render(request, 'workers/worker_list.html', context)
 
+
+def user_list(request):
+    positions = Position.objects.all()
+    users = AuthUser.objects.filter(is_deleted=0)
+    users_deleted = AuthUser.objects.filter(is_deleted=1)
+    workers = Worker.objects.filter()
+    agents = Agent.objects.filter()
+    if request.method == 'POST':
+        if request.POST.get('delete_user'):
+            delete_user = (request.POST.get('delete_user').split())[1]
+            AuthUser.objects.filter(username=delete_user).update(is_deleted=1)
+        if request.POST.get('add_user'):
+            add_user = (request.POST.get('add_user').split())[1]
+            AuthUser.objects.filter(username=add_user).update(is_deleted=0)
+
+
+
+    context = {
+        'workers': workers,
+        'agents': agents,
+        'positions': positions,
+        'users': users,
+        'users_deleted': users_deleted
+    }
+    return render(request, 'workers/user_list.html', context)
 
 class AgentListView(views.View):
 
@@ -122,13 +149,55 @@ class LoginView(views.View):
 class AccountView(views.View):
 
     def get(self, request, *args, **kwargs):
-
         worker = Worker.objects.get(user=request.user.id)
         position = Position.objects.get(position_id=worker.position_id)
+        activities = Activity.objects.filter(user_id=worker.worker_id, date=str(datetime.datetime.now().date())).count()
+        month_activities_daytime = Activity.objects.filter(user_id=worker.worker_id, day=True,
+                                                        date__contains='-'+str(datetime.datetime.now().date().strftime('%m'))+'-').count()
+        month_activities_nighttime = Activity.objects.filter(user_id=worker.worker_id, night=True,
+                                                            date__contains='-' + str(datetime.datetime.now().date().strftime('%m')) + '-').count()
+        if month_activities_daytime > month_activities_nighttime:
+            status = 'жаворонок'
+        elif month_activities_daytime < month_activities_nighttime:
+            status = 'сова'
+        else:
+            status = 'не определено'
         # organizationW = organization.organization_name
+        agreements = Agreement.objects.all()
+        contracts = Contract.objects.all()
+        payments = Payment.objects.all()
+
+        agr = 0
+        con = 0
+        pay = 0
+        for item in agreements:
+            agr += 1
+        for item in contracts:
+            con += 1
+        for item in payments:
+            pay += 1
+        mess1 = ''
+        mess2 = ''
+        if worker.position_id == 1 or worker.position_id == 3:
+            if agr > con:
+                mess1 = 'Есть неоформленные договоры'
+            else:
+                mess1 = ''
+
+        if worker.position_id == 2 or worker.position_id == 3:
+            if con > pay:
+                mess2 = 'Есть неоформленные оплаты'
+            else:
+                mess2 = ''
 
         context = {
             'worker': worker,
+            'activities': activities,
+            'status': status,
+            'daytime': month_activities_daytime,
+            'nighttime': month_activities_nighttime,
+            'mess1': mess1,
+            'mess2': mess2
         }
 
         if (position.position_id == 1):
@@ -157,11 +226,23 @@ def delete_image(request, pk):
 
 def add_client(request):
     error = ''
+    worker = Worker.objects.get(user=request.user.id)
+    if 6 <= datetime.datetime.now().hour < 18:
+        form_activity = UserActivityForm(
+            {'user_id': worker.worker_id, 'date': str(datetime.datetime.now().date()),
+             'time': str(datetime.datetime.now().time()),
+             'day': True, 'night': False})
+    else:
+        form_activity = UserActivityForm(
+            {'user_id': worker.worker_id, 'date': str(datetime.datetime.now().date()),
+             'time': str(datetime.datetime.now().time()),
+             'day': False, 'night': True})
     if request.method == 'POST':
         form = ClientCreateForm(request.POST)
-        if form.is_valid():
+        if form.is_valid() and form_activity.is_valid():
             with transaction.atomic():
                 form.save()
+                form_activity.save()
             return redirect('clients/client_list')
         else:
             error = 'Форма заполнена некорректно'
@@ -273,7 +354,7 @@ def add_worker(request):
                 {'password': make_password('django123'),
                  'last_login': str(datetime.datetime.now()), 'username': generate_username,
                  'date_joined': str(datetime.datetime.now()), 'is_staff': 1, 'is_active': 1,
-                 'is_superuser': 0})
+                 'is_superuser': 0, 'is_deleted': 0})
             form = WorkerCreateForm(req)
             if form_user.is_valid() and form.is_valid():
                 with transaction.atomic():
@@ -340,16 +421,61 @@ class PaymentListView(views.View):
 
 def add_agreement(request):
     error= ''
+    worker = Worker.objects.get(user=request.user.id)
+    if 6 <= datetime.datetime.now().hour < 18:
+        form_activity = UserActivityForm(
+            {'user_id': worker.worker_id, 'date': str(datetime.datetime.now().date()),
+             'time': str(datetime.datetime.now().time()),
+             'day': True, 'night': False})
+    else:
+        form_activity = UserActivityForm(
+            {'user_id': worker.worker_id, 'date': str(datetime.datetime.now().date()),
+             'time': str(datetime.datetime.now().time()),
+             'day': False, 'night': True})
+
     if request.method == 'POST':
-        city = request.POST.get('city')
+        get_city = request.POST.get('city')
+        get_country = request.POST.get('country')
         form_city_agreement = CityAgreementCreateForm(request.POST)
         form = AgreementCreateForm(request.POST)
-        worker = Worker.objects.get(user=request.user.id)
-        if form.is_valid():
+
+        if form.is_valid() and form_activity.is_valid():
             agreement_instance = form.save(commit=False)
             agreement_instance.worker_id = worker.worker_id
             agreement_instance.save()
+            form_activity.save()
             last_agreement_id = Agreement.objects.all().last().agreement_id
+            city = 5
+            if get_country=='1':
+                if get_city=='0':
+                    city = 2
+                if get_city=='1':
+                    city = 2
+                if get_city=='2':
+                    city = 3
+            if get_country=='2':
+                if get_city==0:
+                    city = 4
+                if get_city==1:
+                    city = 5
+                else:
+                    city = 6
+            if get_country=='3':
+                if get_city==0:
+                    city = 7
+                if get_city==1:
+                    city = 8
+                else:
+                    city = 9
+            if get_country=='4':
+                if get_city==0:
+                    city = 10
+            if get_country=='5':
+                if get_city==0:
+                    city = 11
+            if get_country=='6':
+                if get_city==0:
+                    city = 12
             form_city_agreement = CityAgreementCreateForm(
             {'city': city, 'agreement': last_agreement_id})
             form_city_agreement.save()
@@ -383,18 +509,30 @@ def add_agreement(request):
 def add_contract(request):
     error= ''
     agreement = Agreement.objects.all().last()
+    worker = Worker.objects.get(user=request.user.id)
+    if 6 <= datetime.datetime.now().hour < 18:
+        form_activity = UserActivityForm(
+            {'user_id': worker.worker_id, 'date': str(datetime.datetime.now().date()),
+             'time': str(datetime.datetime.now().time()),
+             'day': True, 'night': False})
+    else:
+        form_activity = UserActivityForm(
+            {'user_id': worker.worker_id, 'date': str(datetime.datetime.now().date()),
+             'time': str(datetime.datetime.now().time()),
+             'day': False, 'night': True})
+
     if request.method == 'POST':
         form_route = RouteCreateForm(request.POST)
         form_tourist = TouristInContractForm(request.POST)
         form_route_in_contract = RouteInContractCreateForm(request.POST)
         form = ContractCreateForm(request.POST)
-        worker = Worker.objects.get(user=request.user.id)
         tourist = request.POST.get('tourist')
-        if form.is_valid():
+        if form.is_valid() and form_activity.is_valid():
             contract_instance = form.save(commit=False)
             contract_instance.worker_id = worker.worker_id
             contract_instance.agreement_id = agreement.agreement_id
             contract_instance.save()
+            form_activity.save()
             last_contract_id = Contract.objects.all().last().contract_id
             form_tourist = TouristInContractForm(
                 {'tourist': tourist, 'contract': last_contract_id})
@@ -464,15 +602,26 @@ def add_contract(request):
 
 def add_payment(request):
     error= ''
+    worker = Worker.objects.get(user=request.user.id)
+    if 6 <= datetime.datetime.now().hour < 18:
+        form_activity = UserActivityForm(
+            {'user_id': worker.worker_id, 'date': str(datetime.datetime.now().date()),
+             'time': str(datetime.datetime.now().time()),
+             'day': True, 'night': False})
+    else:
+        form_activity = UserActivityForm(
+            {'user_id': worker.worker_id, 'date': str(datetime.datetime.now().date()),
+             'time': str(datetime.datetime.now().time()),
+             'day': False, 'night': True})
     if request.method == 'POST':
         form = PaymentCreateForm(request.POST)
-        worker = Worker.objects.get(user=request.user.id)
-        if form.is_valid():
+        if form.is_valid() and form_activity.is_valid():
             payment_instance = form.save(commit=False)
             payment_instance.worker_id = worker.worker_id
             last_contract_id = Contract.objects.all().last().contract_id
             payment_instance.contract_id = last_contract_id
             payment_instance.save()
+            form_activity.save()
             return redirect('documents/payment_list')
         else:
             error = str(form.errors)
@@ -481,10 +630,10 @@ def add_payment(request):
     contracts = Contract.objects.all()
     # get_currency_amount = Contract.objects.all().last().amount
     # currency = Currency.objects.all()
-    get_currency = contract.currency_code
-    currency_card = get_currency.currency_code
+    get_currency = contract.currency_id
+    currency_card = get_currency.currency_id
     get_currency_amount = contract.amount
-    currency_card = Currency.objects.get(currency_code=currency_card)
+    currency_card = Currency.objects.get(currency_id=currency_card)
     get_currency_course = currency_card.course
     payment_amount = int(get_currency_amount)*int(get_currency_course)
     positions = Position.objects.all()
@@ -579,6 +728,9 @@ def contract_card(request, pk):
     error = ''
 
     contract = Contract.objects.get(contract_id=pk)
+    worker = Worker.objects.get(user=request.user.id)
+    worker_position = worker.position
+
     if request.method == 'POST':
         form = ContractCreateForm(request.POST, instance=contract)
         if form.is_valid():
@@ -605,13 +757,28 @@ def contract_card(request, pk):
     countries = Country.objects.all()
     currency = Currency.objects.all()
     agent_use = Agent.objects.filter(agent_id=agreement.agent_id)
-    get_currency = contract.currency_code
-    currency_card = get_currency.currency_code
+    get_currency = contract.currency_id
+    currency_card = get_currency.currency_id
     get_currency_amount = contract.amount
     routes = Route.objects.all()
     room_types = RoomType.objects.all()
     route_in_contract = RouteInContract.objects.filter(contract_id=contract.contract_id)
     tourist_in_contract = TouristInContract.objects.filter(contract_id=contract.contract_id)
+    agreements = Agreement.objects.all()
+    contracts = Contract.objects.all()
+    payments = Payment.objects.filter(contract_id=contract.contract_id)
+
+    if payments:
+        style = "border: 2px solid black; margin-top: 50px; padding: 20px; border-radius: 10px; text-align: center; background: lightgreen;"
+        style2 = "border: 2px solid red; margin-top: 50px; padding: 20px; border-radius: 10px; text-align: center; background: lightblue;"
+        step = "завершен"
+        step2 = "текущий этап"
+    else:
+        style = "border: 2px solid red; margin-top: 50px; padding: 20px; border-radius: 10px; text-align: center; background: lightblue;"
+        style2 = "border: 2px solid red; margin-top: 50px; padding: 20px; border-radius: 10px; text-align: center; background: pink;"
+        step = "текущий этап"
+        step2 = "следующий этап"
+
 
     def get_array():
         array = []
@@ -640,6 +807,7 @@ def contract_card(request, pk):
             return array_routes
 
 
+
     context = {
         'form': form,
         'positions': positions,
@@ -662,5 +830,10 @@ def contract_card(request, pk):
         'currency': currency,
         'get_currency_amount': get_currency_amount,
         'room_types': room_types,
+        'worker_position': worker_position,
+        'style': style,
+        'style2': style2,
+        'step2': step2,
+        'step': step,
         }
     return render(request, 'documents/contract_card.html', context)

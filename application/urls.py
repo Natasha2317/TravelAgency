@@ -20,6 +20,7 @@ urlpatterns = [
     path('contract_list', ContractListView.as_view(), name='documents/contract_list'),
     path('payment_list', PaymentListView.as_view(), name='documents/payment_list'),
     path('currency_list', views.currency_list, name='documents/currency_list'),
+    path('user_list', views.user_list, name='workers/user_list'),
     path('agreement_card/<int:pk>/', views.agreement_card, name='documents/agreement_card'),
     # path('payment_card/<int:pk>/', views.payment_card, name='documents/payment_card'),
     path('contract_card/<int:pk>/', views.contract_card, name='documents/contract_card'),

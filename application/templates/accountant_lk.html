@@ -40,16 +40,19 @@
                   <p class="name_user">Бухгалтер - {{ worker.worker_name }}</p>
                 </div>
             </div>
+            <div class="row">
+                <div class="col align-self-end name_user">
+                    <p class="mb-2">Активностей в дневное время: {{ daytime }}, в вечернее время: {{ nighttime }}</p>
+                    <p class="mb-2">Ваш статус: {{ status }} </p>
+                    <p class="mb-2">Активностей за сегодня: {{ activities }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="alert alert-warning">
+            {{mess2}}
         </div>
         <div class="container col-md-10 lists">
             <div class="row">
-                <div class="col">
-                    <div class="list-group">
-                        <button type="button" class="list-group-item list-group-item-success">Валютный учет</button>
-                        <a href="#" class="list-group-item list-group-item-action">Валюты</a>
-                        <a href="#" class="list-group-item list-group-item-action">Курсы валюты</a>
-                    </div>
-                </div>
                 <div class="col">
                     <div class="list-group">
                         <button type="button" class="list-group-item list-group-item-success">Клиентские договоры</button>
@@ -62,7 +65,7 @@
                 <div class="col">
                     <div class="list-group">
                         <button type="button" class="list-group-item list-group-item-success">Отчёты</button>
-                        <a href="{% url 'documents/contract_list' %}" class="list-group-item list-group-item-action">Неоплаченный договоры</a>
+                        <a href="{% url 'documents/contract_list' %}" class="list-group-item list-group-item-action">Неоплаченные договоры</a>
                     </div>
                 </div>
                 <div class="col">
@@ -72,7 +75,7 @@
                     </div>
                 </div>
             </div>
-            </div>
+        </div>
         </div>
     </main>
     <footer></footer>

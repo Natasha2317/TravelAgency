@@ -87,7 +87,7 @@ class AgentCreateForm(ModelForm):
 class UserCreateForm(ModelForm):
     class Meta:
         model = AuthUser
-        fields = ['password', 'last_login', 'username', 'date_joined', 'is_superuser','is_staff', 'is_active']
+        fields = ['password', 'last_login', 'username', 'date_joined', 'is_superuser','is_staff', 'is_active', 'is_deleted']
 
 
 class AgreementCreateForm(ModelForm):
@@ -113,7 +113,7 @@ class RouteCreateForm(ModelForm):
 class ContractCreateForm(ModelForm):
     class Meta:
         model = Contract
-        fields = ['contract_number', 'contract_date', 'organization', 'currency_code', 'amount']
+        fields = ['contract_number', 'contract_date', 'organization', 'currency_id', 'amount']
 
 
 class TouristInContractForm(ModelForm):
@@ -131,3 +131,9 @@ class PaymentCreateForm(ModelForm):
     class Meta:
         model = Payment
         fields = ['payment_number', 'payment_date', 'contract', 'amount']
+
+
+class UserActivityForm(ModelForm):
+    class Meta:
+        model = Activity
+        fields = ['user_id', 'date', 'time', 'day', 'night']

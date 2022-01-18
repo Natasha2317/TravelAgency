@@ -2,6 +2,7 @@
 from django.contrib.auth.models import User
 from django.db import models
 from django.conf import settings
+from softdelete.models import SoftDeleteObject
 
 
 class Account(models.Model):
@@ -82,10 +83,14 @@ class AuthUser(models.Model):
     is_staff = models.IntegerField()
     is_active = models.IntegerField()
     date_joined = models.DateTimeField()
+    is_deleted = models.BooleanField(default=False)
+
 
     USERNAME_FIELD = 'username'
     REQUIRED_FIELDS = []
-
+    # def soft_delete_policy_action(self, **kwargs):
+    # # Insert here custom pre delete logic
+    #     super().soft_delete_policy_action(**kwargs)
     class Meta:
         managed = False
         db_table = 'auth_user'
@@ -171,7 +176,7 @@ class Contract(models.Model):
     worker = models.ForeignKey('Worker', models.DO_NOTHING)
     organization = models.ForeignKey('Organization', models.DO_NOTHING)
     contract_date = models.DateTimeField()
-    currency_code = models.ForeignKey('Currency', models.DO_NOTHING, db_column='currency_code')
+    currency_id = models.ForeignKey('Currency', models.DO_NOTHING, db_column='currency_id')
     amount = models.IntegerField()
     agreement = models.ForeignKey(Agreement, models.DO_NOTHING)
 
@@ -190,7 +195,8 @@ class Country(models.Model):
 
 
 class Currency(models.Model):
-    currency_code = models.IntegerField(primary_key=True)
+    currency_id = models.IntegerField(primary_key=True)
+    currency_code = models.CharField(max_length=3)
     currency_name = models.CharField(max_length=15)
     letter_code = models.CharField(max_length=3)
     units = models.CharField(max_length=7)
@@ -403,3 +409,19 @@ class Worker(models.Model):
     class Meta:
         managed = False
         db_table = 'worker'
+
+
+class Activity(models.Model):
+    activity_id = models.AutoField(primary_key=True)
+    user_id = models.IntegerField()
+    date = models.DateField()
+    time = models.TimeField(blank=True, null=True)
+    day = models.BooleanField(default=False)
+    night = models.BooleanField(default=False)
+
+    class Meta:
+        managed = True
+        db_table = 'activity'
+
+    def __str__(self):
+        return self.user_id.__str__()

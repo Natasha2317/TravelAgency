@@ -1,7 +1,6 @@
 from django.contrib import admin
 from .models import *
 
-
 class AgentAdmin(admin.ModelAdmin):
     list_display = ('agent_id', 'agent_fio', 'organization')
 class ClientAdmin(admin.ModelAdmin):
@@ -25,6 +24,8 @@ class OrganizationAdmin(admin.ModelAdmin):
 
 class PositionAdmin(admin.ModelAdmin):
     list_display = ('position_id', 'position_name')
+
+
 
 
 admin.site.register(Agent, AgentAdmin)

@@ -40,6 +40,16 @@
                   <p class="name_user">Менеджер - {{ worker.worker_name }}</p>
                 </div>
             </div>
+            <div class="row">
+                <div class="col align-self-end name_user">
+                    <p class="mb-2">Активностей в дневное время: {{ daytime }}, в вечернее время: {{ nighttime }}</p>
+                    <p class="mb-2">Ваш статус: {{ status }} </p>
+                    <p class="mb-2">Активностей за сегодня: {{ activities }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="alert alert-warning">
+            {{mess1}}
         </div>
         <div class="container col-md-10 lists">
             <div class="row">
@@ -58,7 +68,7 @@
                     </div>
                 </div>
             </div>
-            </div>
+        </div>
         </div>
     </main>
     <footer></footer>
